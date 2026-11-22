@@ -1,53 +1,37 @@
 import 'package:flutter/material.dart';
 
+import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
+import 'screens/contacts_screen.dart';
+
+// Point d'entrée de l'application
 void main() {
-  runApp(MaterialApp(home: LoginPage()));
+  runApp(const MyApp());
 }
 
-class LoginPage extends StatefulWidget {
+// Application principale
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
-  State<LoginPage> createState() => LoginPageState();
-}
-
-class LoginPageState extends State<LoginPage> {
-  final email = TextEditingController();
-  final password = TextEditingController();
-  String message = '';
-
-  void login() {
-    if (email.text == 'test@test.com' &&
-        password.text == '1234') {
-      setState(() {
-        message = 'Connexion réussie';
-      });
-    } else {
-      setState(() {
-        message = 'Email ou mot de passe incorrect';
-      });
-    }
-  }
-
-   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          TextField(
-            decoration: InputDecoration(labelText: 'Email'),
-            controller: email,
-          ),
-          TextField(
-            obscureText: true,
-            decoration: InputDecoration(labelText: 'Mot de passe'),
-            controller: password,
-          ),
-          ElevatedButton(
-            child: Text('Se connecter'),
-            onPressed: login,
-          ),
-          Text(message),
-        ],
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+
+      title: "Mon App d'Authentification",
+
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+
+      initialRoute: '/',
+
+      routes: {
+        '/': (context) => const LoginScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignUpScreen(),
+        '/contacts': (context) => const ContactsScreen(),
+      },
     );
   }
 }
