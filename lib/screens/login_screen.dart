@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../data/user_data.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,10 +14,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
-  void _handleLogin() {
-    String email = _emailController.text.trim();
-    String password = _passwordController.text;
+  Future<void> _handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
       _showErrorDialog('Veuillez remplir tous les champs');
@@ -28,20 +30,30 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // Vérification dans la liste des utilisateurs
-    bool isValid = UserData.login(email, password);
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (isValid) {
-      Navigator.pushReplacementNamed(context, '/contacts');
-    } else {
-      _showErrorDialog(
-        'Email ou mot de passe incorrect',
-      );
+    await Future.delayed(const Duration(seconds: 1));
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    // Vérification dans la liste des utilisateurs
+    final isValid = UserData.login(email, password);
+
+    if (!isValid) {
+      _showErrorDialog('Email ou mot de passe incorrect');
+      return;
     }
+
+    _showSuccessDialog();
   }
 
   void _showErrorDialog(String message) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
@@ -50,6 +62,27 @@ class _LoginScreenState extends State<LoginScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Succès'),
+          content: const Text('Connexion réussie !'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                Navigator.pushReplacementNamed(context, '/contacts');
+              },
               child: const Text('OK'),
             ),
           ],
@@ -68,11 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                const Icon(
-                  Icons.account_circle,
-                  size: 80,
-                  color: Colors.blue,
-                ),
+                const Icon(Icons.account_circle, size: 80, color: Colors.blue),
                 const SizedBox(height: 20),
 
                 const Text(
@@ -129,13 +158,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _handleLogin,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      child: Text(
-                        'Se connecter',
-                        style: TextStyle(fontSize: 18),
-                      ),
+                    onPressed: _isLoading ? null : _handleLogin,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Se connecter',
+                              style: TextStyle(fontSize: 18),
+                            ),
                     ),
                   ),
                 ),

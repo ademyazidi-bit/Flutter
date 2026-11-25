@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/contacts_screen.dart';
+import 'screens/contact_form_screen.dart';
 
 // Point d'entrée de l'application
 void main() {
@@ -20,9 +21,7 @@ class MyApp extends StatelessWidget {
 
       title: "Mon App d'Authentification",
 
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
 
       initialRoute: '/',
 
@@ -31,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/contacts': (context) => const ContactsScreen(),
+        '/contact-form': (context) => const ContactFormScreen(),
       },
     );
   }
